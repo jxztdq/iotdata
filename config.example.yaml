@@ -1,0 +1,67 @@
+server:
+  listen: ":8080"
+  websocket_path: "/ws"
+
+influxdb:
+  url: "http://127.0.0.1:8086"
+  org: "factory"
+  bucket: "telemetry"
+  token: "${INFLUXDB_TOKEN}"
+
+devices:
+  - id: meter-rtu-01
+    protocol: modbus-rtu
+    enabled: true
+    poll_interval: 2s
+    timeout: 5s
+    modbus:
+      port: "/dev/ttyUSB0"
+      baud_rate: 9600
+      data_bits: 8
+      parity: even
+      stop_bits: 1
+      slave_id: 1
+      timeout: 3s
+    points:
+      - name: temperature
+        function: holding_register
+        address: 99 # zero-based address
+        quantity: 2
+        data_type: float32
+        byte_order: ABCD
+        scale: 1.0
+        offset: 0
+
+  - id: meter-tcp-01
+    protocol: modbus-tcp
+    enabled: false
+    poll_interval: 5s
+    modbus:
+      address: "192.168.1.20:502"
+      slave_id: 1
+      timeout: 3s
+    points:
+      - name: pressure
+        function: input_register
+        address: 199
+        quantity: 1
+        data_type: uint16
+        byte_order: ABCD
+        scale: 0.1
+        offset: 0
+
+  - id: api-device
+    protocol: http
+    enabled: false
+    poll_interval: 10s
+    address: "http://192.168.1.30/api/status"
+    method: GET
+    timeout: 5s
+
+  - id: raw-tcp-device
+    protocol: tcp
+    enabled: false
+    poll_interval: 10s
+    address: "192.168.1.40:9000"
+    request: "READ\n"
+    timeout: 5s
