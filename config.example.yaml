@@ -18,18 +18,26 @@ devices:
       port: "/dev/ttyUSB0"
       baud_rate: 9600
       data_bits: 8
-      parity: even
+      parity: N
       stop_bits: 1
       slave_id: 1
       timeout: 3s
     points:
       - name: temperature
-        function: holding_register
-        address: 99 # zero-based address
-        quantity: 2
-        data_type: float32
-        byte_order: ABCD
-        scale: 1.0
+        function: input_register
+        address: 1 # zero-based address
+        quantity: 1
+        data_type: int16
+        byte_order: big
+        scale: 0.1
+        offset: 0
+      - name: humidity
+        function: input_register
+        address: 0 # zero-based address
+        quantity: 1
+        data_type: int16
+        byte_order: big
+        scale: 0.1
         offset: 0
 
   - id: meter-tcp-01
@@ -46,7 +54,7 @@ devices:
         address: 199
         quantity: 1
         data_type: uint16
-        byte_order: ABCD
+        byte_order: big
         scale: 0.1
         offset: 0
 
